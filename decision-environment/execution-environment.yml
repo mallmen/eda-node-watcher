@@ -1,0 +1,20 @@
+---
+version: 3
+
+images:
+  base_image:
+    name: registry.redhat.io/ansible-automation-platform-26/de-supported-rhel9:latest
+
+dependencies:
+  galaxy: requirements.yml
+  python: requirements.txt
+  system:
+    - pkg-config
+    - libffi-devel
+    - systemd-devel
+    - gcc
+    - python3.12-devel
+    - python3-devel      
+
+options:
+  package_manager_path: /usr/bin/microdnf
