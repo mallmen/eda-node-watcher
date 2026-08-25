@@ -1,0 +1,9 @@
+# eda-token.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eda-node-watcher-token
+  namespace: eda-system
+  annotations:
+    kubernetes.io/service-account.name: eda-node-watcher
+type: kubernetes.io/service-account-token

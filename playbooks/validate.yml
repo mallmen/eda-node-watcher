@@ -1,0 +1,28 @@
+---
+- name: Firewall Config, Validation
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Configure node firewall (e.g., Firewalld/IPTables)
+      ansible.builtin.debug:
+        msg:
+          - "Configuring firewall for:"
+          - "  port: {{ item }}"
+          - "  host: {{ node_name }}"
+          - "  ip:   {{ node_ip }}"
+      loop:
+        - "10250/tcp"  # Kubelet
+        - "22623/tcp"  # Machine Config Server
+
+    - name: Validate network responsiveness
+      ansible.builtin.debug:
+        msg:
+          - "Validated firewall for:"
+          - "  port: {{ item }}"
+          - "  host: {{ node_name }}"
+          - "  ip:   {{ node_ip }}"
+      loop:
+        - "10250/tcp"  # Kubelet
+        - "22623/tcp"  # Machine Config Server

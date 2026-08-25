@@ -1,0 +1,37 @@
+---
+- name: OpenShift Node Provisioning Lifecycle Manager
+  hosts: localhost
+
+  sources:
+    - ansible.eda.k8s:
+        # Pull host and token directly from environment variables injected by AAP Credential
+        host: "{{ lookup('env', 'K8S_AUTH_HOST') }}"
+        api_key: "{{ lookup('env', 'K8S_AUTH_API_KEY') }}"
+        validate_certs: false
+        api_version: "v1"
+        kind: "Node"
+
+  rules:
+    # RULE 1: Trigger Job Template to taint newly provisioned nodes
+    - name: Taint Newly Provisioned Node
+      condition: event.type == "ADDED"
+      action:
+        run_job_template:
+          name: "Node - Taint Provisioning Node"
+          organization: "Default"
+          extra_vars:
+            node_name: "{{ event.object.metadata.name }}"
+
+    # RULE 2: Trigger Workflow Template for validation, firewalling, and untainting
+    - name: Validate Firewall and Untaint Node
+      condition: >
+        event.type == "MODIFIED" and
+        event.object.status.conditions | selectattr('type', 'equalto', 'Ready')
+        | selectattr('status', 'equalto', 'True') | list | length > 0
+      action:
+        run_workflow_template:
+          name: "Node - Validate Firewall & Untaint Workflow"
+          organization: "Default"
+          extra_vars:
+            node_name: "{{ event.object.metadata.name }}"
+            node_ip: "{{ event.object.status.addresses | selectattr('type', 'equalto', 'InternalIP') | map(attribute='address') | first }}"

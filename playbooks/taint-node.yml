@@ -1,0 +1,15 @@
+---
+- name: Taint Newly Provisioned Node
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Apply NoSchedule taint to node
+      kubernetes.core.k8s_taint:
+        name: "{{ node_name }}"
+        taints:
+          - key: "node.kubernetes.io/unschedulable"
+            value: "provisioning"
+            effect: "NoSchedule"
+        state: "{{ state | default('present') }}"
