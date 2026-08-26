@@ -4,15 +4,15 @@
 
   sources:
     - sabre1041.eda.k8s:
-        host: "{{ k8s_host }}"
-        api_key: "{{ k8s_token }}"
+        host: "{{ K8S_HOST }}"
+        api_key: "{{ K8S_TOKEN }}"
         validate_certs: false
         api_version: "machine.openshift.io/v1beta1"
         kind: "Machine"
 
   rules:
     - name: Notify
-      condition: true
+      condition: event.type != ""
       action:
         debug:
           msg: "{{ event }}"                     
