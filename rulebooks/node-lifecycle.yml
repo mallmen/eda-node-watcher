@@ -4,9 +4,8 @@
 
   sources:
     - ansible.eda.k8s:
-        # Pull host and token directly from environment variables injected by AAP Credential
-        host: "{{ lookup('env', 'K8S_AUTH_HOST') }}"
-        api_key: "{{ lookup('env', 'K8S_AUTH_API_KEY') }}"
+        host: "{{ lookup('env', 'EDA_CONTAINER_REGISTRY_URL') }}"
+        api_key: "{{ lookup('env', 'EDA_CONTAINER_REGISTRY_PASSWORD') }}"
         validate_certs: false
         api_version: "v1"
         kind: "Node"
