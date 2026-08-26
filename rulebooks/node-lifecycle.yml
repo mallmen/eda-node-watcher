@@ -7,7 +7,7 @@
         host: "{{ lookup('env', 'K8S_AUTH_HOST') }}"
         api_key: "{{ lookup('env', 'K8S_AUTH_API_KEY') }}"
         validate_certs: false
-        api_version: "v1"
+        api_version: "machine.openshift.io/v1beta1"
         kind: "Machine"
 
   rules:
