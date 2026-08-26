@@ -1,14 +1,20 @@
 ---
-- name: Validate OpenShift API Connectivity
+- name: Watch for untrusted OpenShift nodes via Alertmanager
   hosts: localhost
+
   sources:
-    - kubernetes.core.k8s:
-        api_version: v1
-        kind: Node
-        
+    - ansible.eda.alertmanager:
+        host: 0.0.0.0
+        port: 5000
+
   rules:
-    - name: Catch any Node status update
-      condition: event.type == 'MODIFIED'
+    - name: Trigger validation for new untrusted node
+      condition: event.alert.labels.alertname == 'UntrustedNodeProvisioned'
       action:
-        print_event:
-          pretty: true
+        run_job_template:
+          name: "OCP4: Validate"
+          organization: "Lab"
+          job_args:
+            extra_vars:
+              node_name: "{{ event.alert.labels.node }}"
+              node_ip: "{{ event.alert.labels.internal_ip }}"
