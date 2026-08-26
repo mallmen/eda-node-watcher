@@ -4,8 +4,8 @@
 
   sources:
     - sabre1041.eda.k8s:
-        host: "{{ lookup('env', 'K8S_AUTH_HOST') }}"
-        api_key: "{{ lookup('env', 'K8S_AUTH_API_KEY') }}"
+        host: "{{ env.K8S_AUTH_HOST }}"
+        api_key: "{{ env.K8S_AUTH_API_KEY }}"
         validate_certs: false
         api_version: "machine.openshift.io/v1beta1"
         kind: "Machine"
