@@ -8,30 +8,10 @@
         api_key: "{{ lookup('env', 'K8S_AUTH_API_KEY') }}"
         validate_certs: false
         api_version: "v1"
-        kind: "Node"
+        kind: "Machine"
 
   rules:
-    # RULE 1: Taint newly provisioned nodes
-    - name: Taint Newly Provisioned Node
-      condition: event.type == "ADDED"
+    - name: Notify
+      condition: true
       action:
-        run_job_template:
-          name: "Node - Taint Provisioning Node"
-          organization: "Default"
-          extra_vars:
-            node_name: "{{ event.object.metadata.name }}"
-
-    # RULE 2: Validate Firewall and Untaint Node
-    # Replaced Jinja pipes (|) with native EDA array field matching
-    - name: Validate Firewall and Untaint Node
-      condition: >
-        event.type == "MODIFIED" and
-        event.object.status.conditions.[+item].type == "Ready" and
-        event.object.status.conditions.[+item].status == "True"
-      action:
-        run_workflow_template:
-          name: "Node - Validate Firewall & Untaint Workflow"
-          organization: "Default"
-          extra_vars:
-            node_name: "{{ event.object.metadata.name }}"
-            node_ip: "{{ event.object.status.addresses[0].address }}"
+        debug: "{{ event }}"                     
