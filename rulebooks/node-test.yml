@@ -1,0 +1,14 @@
+---
+- name: Validate OpenShift API Connectivity
+  hosts: localhost
+  sources:
+    - kubernetes.core.k8s:
+        api_version: v1
+        kind: Node
+        
+  rules:
+    - name: Catch any Node status update
+      condition: event.type == 'MODIFIED'
+      action:
+        print_event:
+          pretty: true
