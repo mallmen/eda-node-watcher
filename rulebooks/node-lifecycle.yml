@@ -11,26 +11,27 @@
         kind: "Node"
 
   rules:
-    # RULE 1: Trigger Job Template to taint newly provisioned nodes
+    # RULE 1: Taint newly provisioned nodes
     - name: Taint Newly Provisioned Node
       condition: event.type == "ADDED"
       action:
         run_job_template:
-          name: "OCP4: Taint node"
-          organization: "Lab"
+          name: "Node - Taint Provisioning Node"
+          organization: "Default"
           extra_vars:
             node_name: "{{ event.object.metadata.name }}"
 
-    # RULE 2: Trigger Workflow Template for validation, firewalling, and untainting
+    # RULE 2: Validate Firewall and Untaint Node
+    # Replaced Jinja pipes (|) with native EDA array field matching
     - name: Validate Firewall and Untaint Node
       condition: >
         event.type == "MODIFIED" and
-        event.object.status.conditions | selectattr('type', 'equalto', 'Ready')
-        | selectattr('status', 'equalto', 'True') | list | length > 0
+        event.object.status.conditions.[+item].type == "Ready" and
+        event.object.status.conditions.[+item].status == "True"
       action:
         run_workflow_template:
-          name: "OCP4: Validate and remove taint"
-          organization: "Lab"
+          name: "Node - Validate Firewall & Untaint Workflow"
+          organization: "Default"
           extra_vars:
             node_name: "{{ event.object.metadata.name }}"
-            node_ip: "{{ event.object.status.addresses | selectattr('type', 'equalto', 'InternalIP') | map(attribute='address') | first }}"
+            node_ip: "{{ event.object.status.addresses[0].address }}"
